@@ -15,6 +15,7 @@ FROM docker.io/library/node:18-alpine AS build_node_modules
 COPY src/ /app/
 WORKDIR /app
 RUN npm ci --production
+RUN npm run-script build
 
 # Copy build result to a new image.
 # This saves a lot of disk space.

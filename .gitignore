@@ -3,3 +3,5 @@
 /wg0.json
 /src/lib/*.js
 /src/services/*.js
+/src/server.js
+/src/config.js
