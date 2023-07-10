@@ -13,7 +13,7 @@ export const WG_MTU = process.env.WG_MTU || null;
 export const WG_PERSISTENT_KEEPALIVE = process.env.WG_PERSISTENT_KEEPALIVE || 0;
 export const WG_DEFAULT_ADDRESS = process.env.WG_DEFAULT_ADDRESS || '10.8.0.x';
 export const WG_DEFAULT_INTERFACE = process.env.WG_DEFAULT_INTERFACE || 'wg0';
-if(!WG_DEFAULT_ADDRESS.match(/^wg[0-9]+$/g)) throw new Error("WG_DEFAULT_ADDRESS must be in the format of wg0, wg1, wg2, etc.")
+if(!/^wg[0-9]+$/g.test(WG_DEFAULT_INTERFACE)) throw new Error("WG_DEFAULT_ADDRESS must be in the format of wg0, wg1, wg2, etc.")
 
 export const WG_DEFAULT_DNS = typeof process.env.WG_DEFAULT_DNS === 'string'
   ? process.env.WG_DEFAULT_DNS
