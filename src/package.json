@@ -5,22 +5,32 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "serve": "DEBUG=Server,WireGuard nodemon server.js",
+    "build": "tsc",
+    "serve": "DEBUG=Server,WireGuard nodemon server.ts",
     "serve-with-password": "PASSWORD=wg npm run serve",
     "lint": "eslint ."
   },
   "author": "Emile Nijssen",
   "license": "GPL",
   "dependencies": {
+    "@types/debug": "^4.1.8",
+    "@types/express": "^4.17.17",
+    "@types/express-session": "^1.17.7",
+    "@types/node": "^14.18.53",
+    "@types/qrcode": "^1.5.1",
+    "@types/uuid": "^9.0.2",
     "debug": "^4.3.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "qrcode": "^1.4.4",
+    "typescript": "^5.1.6",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "eslint": "^7.27.0",
-    "eslint-config-athom": "^2.1.0"
+    "eslint-config-athom": "^2.1.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
   },
   "nodemonConfig": {
     "ignore": [
@@ -28,6 +38,6 @@
     ]
   },
   "engines": {
-    "node": "14"
+    "node": "18"
   }
 }
