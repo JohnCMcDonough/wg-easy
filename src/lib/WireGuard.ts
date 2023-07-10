@@ -24,7 +24,7 @@ import {
   WG_POST_UP,
   WG_PRE_DOWN,
   WG_POST_DOWN,
-  WG_DEFAULT_INTERFACE,
+  WG_INTERFACE,
 } from "../config";
 
 export interface Config {
@@ -63,7 +63,7 @@ export interface Client {
   persistentKeepalive: string | null | undefined;
 }
 
-const wgi = WG_DEFAULT_INTERFACE;
+const wgi = WG_INTERFACE;
 
 export default class WireGuard {
   private __configPromise?: Promise<Config>;
