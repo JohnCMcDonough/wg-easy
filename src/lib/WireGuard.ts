@@ -24,6 +24,7 @@ import {
   WG_POST_UP,
   WG_PRE_DOWN,
   WG_POST_DOWN,
+  WG_DEFAULT_INTERFACE,
 } from "../config";
 
 export interface Config {
@@ -62,6 +63,8 @@ export interface Client {
   persistentKeepalive: string | null | undefined;
 }
 
+const wgi = WG_DEFAULT_INTERFACE;
+
 export default class WireGuard {
   private __configPromise?: Promise<Config>;
   private watcher?: FSWatcher;
@@ -76,7 +79,10 @@ export default class WireGuard {
         debug("Loading configuration...");
         let config;
         try {
-          config = await fsp.readFile(path.join(WG_PATH, "wg0.json"), "utf8");
+          config = await fsp.readFile(
+            path.join(WG_PATH, `${wgi}.json`),
+            "utf8"
+          );
           config = JSON.parse(config);
           debug("Configuration loaded.");
         } catch (err) {
@@ -98,24 +104,20 @@ export default class WireGuard {
         }
 
         await this.__saveConfig(config);
-        await Util.exec("wg-quick down wg0").catch(() => {});
-        await Util.exec("wg-quick up wg0").catch((err) => {
+        await Util.exec(`wg-quick down ${wgi}`).catch(() => {});
+        await Util.exec(`wg-quick up ${wgi}`).catch((err) => {
           if (
             err &&
             err.message &&
-            err.message.includes('Cannot find device "wg0"')
+            err.message.includes(`Cannot find device "${wgi}"`)
           ) {
             throw new Error(
-              'WireGuard exited with the error: Cannot find device "wg0"\nThis usually means that your host\'s kernel does not support WireGuard!'
+              `WireGuard exited with the error: Cannot find device "${wgi}"\nThis usually means that your host\'s kernel does not support WireGuard!`
             );
           }
 
           throw err;
         });
-        // await Util.exec(`iptables -t nat -A POSTROUTING -s ${WG_DEFAULT_ADDRESS.replace('x', '0')}/24 -o eth0 -j MASQUERADE`);
-        // await Util.exec('iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT');
-        // await Util.exec('iptables -A FORWARD -i wg0 -j ACCEPT');
-        // await Util.exec('iptables -A FORWARD -o wg0 -j ACCEPT');
         await this.__syncConfig();
 
         return config;
@@ -169,18 +171,18 @@ export default class WireGuard {
 
     debug("Config saving...");
     await fsp.writeFile(
-      path.join(WG_PATH, "wg0.json"),
+      path.join(WG_PATH, `${wgi}.json`),
       JSON.stringify(config, undefined, 2),
       {
         mode: 0o660,
       }
     );
-    await fsp.writeFile(path.join(WG_PATH, "wg0.conf"), result, {
+    await fsp.writeFile(path.join(WG_PATH, `${wgi}.conf`), result, {
       mode: 0o600,
     });
     debug("Config saved.");
     debug("Watching for changes...");
-    this.watcher = watch(path.join(WG_PATH, "wg0.json"), () => {
+    this.watcher = watch(path.join(WG_PATH, `${wgi}.json`), () => {
       debug("File changed. Reloading config...");
       this.saveConfig();
     });
@@ -188,7 +190,7 @@ export default class WireGuard {
 
   async __syncConfig() {
     debug("Config syncing...");
-    await Util.exec("wg syncconf wg0 <(wg-quick strip wg0)");
+    await Util.exec(`wg syncconf ${wgi} <(wg-quick strip ${wgi})`);
     debug("Config synced.");
   }
 
@@ -220,7 +222,7 @@ export default class WireGuard {
     );
 
     // Loop WireGuard status
-    const dump = await Util.exec("wg show wg0 dump", {
+    const dump = await Util.exec(`wg show ${wgi} dump`, {
       log: false,
     });
     dump
